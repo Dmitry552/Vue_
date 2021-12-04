@@ -1,30 +1,76 @@
 <template>
-  <div id="nav">
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
+  <div class="app">
+    <h3>Страница с постами</h3>
+    <my-button @click="showDialog">Создать пост</my-button>
+    <my-dialog v-model:show="dialogVisible">
+      <post-form @create="createPost"/>
+    </my-dialog>
+    <post-list v-bind:posts="posts" @remove="removePost" v-if="!isPostLoading"/> <!-- v-bind:posts="posts" === :posts="posts" -->
+    <div v-else style="color: red">Идет загрузка...</div>
   </div>
-  <router-view/>
 </template>
 
+<script>
+import PostForm from './components/PostForm.vue';
+import PostList from './components/PostList.vue';
+import MyButton from './components/UI/MyButton.vue';
+import axios from 'axios'
+export default {
+  components: {
+    PostList,
+    PostForm,
+    MyButton
+  },
+  data() {
+    return {
+      posts: [],
+      dialogVisible: false,
+      isPostLoading: false
+    }
+  },
+  methods: {
+    createPost(post) {
+      console.log(post)
+      this.posts.push(post);
+      this.dialogVisible = false
+    },
+    inputTitle(event) {
+      this.title = event.target.value;
+    },
+    inputBody(event) {
+      this.body = event.target.value;
+    },
+    removePost(post) {
+      this.posts = this.posts.filter(p => p.id !== post.id)
+    },
+    showDialog() {
+      this.dialogVisible = true;
+    },
+    async fetchPosts() {
+      try {
+        this.isPostLoading = true;
+        const {data} = await axios.get('https://jsonplaceholder.typicode.com/posts?_limit=10');
+        this.posts = data;
+      } catch (error) {
+        console.log(error)
+      } finally {
+        this.isPostLoading = false;
+      }
+    }
+  },
+  mounted() {
+    this.fetchPosts();
+  }
+}
+</script>
+
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
-
-#nav {
-  padding: 30px;
-}
-
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-#nav a.router-link-exact-active {
-  color: #42b983;
+.app {
+  padding: 20px;
 }
 </style>
