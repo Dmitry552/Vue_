@@ -1,7 +1,7 @@
 <template>
   <form @submit.prevent>
     <h3>Создание поста</h3>
-    <my-input v-model="post.title" placeholder="Название"/> <!-- :value="post.body" @input="inputTitle" === v-model="post.title" -->
+    <my-input v-focus v-model="post.title" placeholder="Название"/> <!-- :value="post.body" @input="inputTitle" === v-model="post.title" -->
     <my-input :value="post.body" @input="post.body = $event.target.value" placeholder="Описание"/>
     <my-button @click="createPost" style="margin-top: 15px">Создать</my-button>
   </form>
@@ -28,6 +28,15 @@ export default {
         title: '',
         body: ''
       }
+    }
+  },
+  watch: {
+    post: {
+      handler(nawValue) {
+        //console.log(nawValue)
+      },
+      deep: true
+      
     }
   }
 }
